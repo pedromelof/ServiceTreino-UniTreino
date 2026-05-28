@@ -1,5 +1,8 @@
 package br.unifor.service.treino.unitreino.Model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class ModelTreino {
 
 	private Long id;
@@ -9,6 +12,8 @@ public class ModelTreino {
 	private String descricao;
 
 	private Integer duracaoMinutos;
+
+	private List<ModelExercicio> exercicios = new ArrayList<>();
 
 	public ModelTreino() {
 	}
@@ -50,6 +55,14 @@ public class ModelTreino {
 
 	public void setDuracaoMinutos(Integer duracaoMinutos) {
 		this.duracaoMinutos = duracaoMinutos;
+	}
+
+	public List<ModelExercicio> getExercicios() {
+		return exercicios;
+	}
+
+	public void setExercicios(List<ModelExercicio> exercicios) {
+		this.exercicios = exercicios != null ? exercicios : new ArrayList<>();
 	}
 
 	@Override

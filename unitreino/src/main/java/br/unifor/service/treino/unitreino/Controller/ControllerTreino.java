@@ -1,5 +1,6 @@
 package br.unifor.service.treino.unitreino.Controller;
 
+import br.unifor.service.treino.unitreino.Model.ModelExercicio;
 import br.unifor.service.treino.unitreino.Model.ModelTreino;
 import br.unifor.service.treino.unitreino.Service.ServiceTreino;
 import org.springframework.http.ResponseEntity;
@@ -52,5 +53,33 @@ public class ControllerTreino {
 		boolean removed = service.deleteTreino(id);
 		if (removed) return ResponseEntity.noContent().build();
 		return ResponseEntity.notFound().build();
+	}
+
+	@GetMapping("/{id}/exercicios")
+	public ResponseEntity<List<ModelExercicio>> listarExercicios(@PathVariable Long id) {
+		if (service.getTreinoById(id).isEmpty()) {
+			return ResponseEntity.notFound().build();
+		}
+		return ResponseEntity.ok(service.getExerciciosDoTreino(id));
+	}
+
+	@PostMapping("/{id}/exercicios")
+	public ResponseEntity<ModelExercicio> adicionarExercicio(@PathVariable Long id, @RequestBody ModelExercicio exercicio) {
+		if (service.getTreinoById(id).isEmpty()) {
+			return ResponseEntity.notFound().build();
+		}
+		ModelExercicio criado = service.addExercicioAoTreino(id, exercicio);
+		URI location = URI.create("/treinos/" + id + "/exercicios/" + criado.getId());
+		return ResponseEntity.created(location).body(criado);
+	}
+
+	@DeleteMapping("/{id}/exercicios/{exercicioId}")
+	public ResponseEntity<Void> removerExercicio(@PathVariable Long id, @PathVariable Long exercicioId) {
+		if (service.getTreinoById(id).isEmpty()) {
+			return ResponseEntity.notFound().build();
+		}
+		return service.removerExercicioDoTreino(id, exercicioId)
+				? ResponseEntity.noContent().build()
+				: ResponseEntity.notFound().build();
 	}
 }

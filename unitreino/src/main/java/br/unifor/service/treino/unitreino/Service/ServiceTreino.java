@@ -1,5 +1,6 @@
 package br.unifor.service.treino.unitreino.Service;
 
+import br.unifor.service.treino.unitreino.Model.ModelExercicio;
 import br.unifor.service.treino.unitreino.Model.ModelTreino;
 import br.unifor.service.treino.unitreino.Repository.RepositoryTreino;
 import org.springframework.stereotype.Service;
@@ -42,5 +43,17 @@ public class ServiceTreino {
             return true;
         }
         return false;
+    }
+
+    public ModelExercicio addExercicioAoTreino(Long treinoId, ModelExercicio exercicio) {
+        return repository.addExercicio(treinoId, exercicio);
+    }
+
+    public List<ModelExercicio> getExerciciosDoTreino(Long treinoId) {
+        return repository.findExerciciosByTreinoId(treinoId);
+    }
+
+    public boolean removerExercicioDoTreino(Long treinoId, Long exercicioId) {
+        return repository.removeExercicio(treinoId, exercicioId);
     }
 }

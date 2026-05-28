@@ -281,6 +281,16 @@
             <div class="route-pill">
               <span>DELETE</span><code>/treinos/{id}</code>
             </div>
+            <div class="route-pill">
+              <span>GET</span><code>/treinos/{id}/exercicios</code>
+            </div>
+            <div class="route-pill">
+              <span>POST</span><code>/treinos/{id}/exercicios</code>
+            </div>
+            <div class="route-pill">
+              <span>DELETE</span
+              ><code>/treinos/{id}/exercicios/{exercicioId}</code>
+            </div>
           </div>
         </article>
       </section>
@@ -352,6 +362,103 @@
             </div>
             <div class="actions">
               <button type="submit" class="danger">DELETE /treinos/{id}</button>
+            </div>
+          </form>
+        </article>
+
+        <article class="card">
+          <h2>Exercícios do treino</h2>
+          <p>Liste, adicione e remova exercícios vinculados a um treino.</p>
+          <form id="formListExercicios" style="margin-bottom: 10px">
+            <div class="field">
+              <label for="idTreinoExercicios">ID do treino</label>
+              <input
+                id="idTreinoExercicios"
+                type="number"
+                required
+                placeholder="1"
+              />
+            </div>
+            <div class="actions">
+              <button type="submit">GET /treinos/{id}/exercicios</button>
+            </div>
+          </form>
+
+          <form id="formAddExercicio">
+            <div class="row">
+              <div class="field">
+                <label for="idTreinoAddExercicio">ID do treino</label>
+                <input
+                  id="idTreinoAddExercicio"
+                  type="number"
+                  required
+                  placeholder="1"
+                />
+              </div>
+              <div class="field">
+                <label for="nomeExercicio">Nome do exercício</label>
+                <input
+                  id="nomeExercicio"
+                  required
+                  placeholder="Ex.: Agachamento"
+                />
+              </div>
+            </div>
+            <div class="row">
+              <div class="field">
+                <label for="seriesExercicio">Séries</label>
+                <input id="seriesExercicio" type="number" min="1" required />
+              </div>
+              <div class="field">
+                <label for="repeticoesExercicio">Repetições</label>
+                <input
+                  id="repeticoesExercicio"
+                  type="number"
+                  min="1"
+                  required
+                />
+              </div>
+            </div>
+            <div class="row">
+              <div class="field">
+                <label for="cargaExercicio">Carga (kg)</label>
+                <input id="cargaExercicio" type="number" min="0" required />
+              </div>
+              <div class="field">
+                <label for="observacaoExercicio">Observação</label>
+                <input id="observacaoExercicio" placeholder="Opcional" />
+              </div>
+            </div>
+            <div class="actions">
+              <button type="submit">POST /treinos/{id}/exercicios</button>
+            </div>
+          </form>
+
+          <form id="formRemoveExercicio" style="margin-top: 10px">
+            <div class="row">
+              <div class="field">
+                <label for="idTreinoRemoveExercicio">ID do treino</label>
+                <input
+                  id="idTreinoRemoveExercicio"
+                  type="number"
+                  required
+                  placeholder="1"
+                />
+              </div>
+              <div class="field">
+                <label for="idExercicioRemove">ID do exercício</label>
+                <input
+                  id="idExercicioRemove"
+                  type="number"
+                  required
+                  placeholder="1"
+                />
+              </div>
+            </div>
+            <div class="actions">
+              <button type="submit" class="danger">
+                DELETE /treinos/{id}/exercicios/{exercicioId}
+              </button>
             </div>
           </form>
         </article>
@@ -517,6 +624,102 @@
             setOutput(data ?? "Sem conteúdo retornado.");
           } catch (error) {
             setStatus(`Falha no DELETE: ${error.message}`, "error");
+            setOutput(error.stack || String(error));
+          }
+        });
+
+      document
+        .getElementById("formListExercicios")
+        .addEventListener("submit", async (event) => {
+          event.preventDefault();
+          const id = document.getElementById("idTreinoExercicios").value;
+
+          try {
+            setStatus(`Consultando GET /treinos/${id}/exercicios...`, "");
+            const { response, data } = await requestJson(
+              `/treinos/${id}/exercicios`,
+            );
+            setStatus(
+              `GET /treinos/${id}/exercicios -> ${response.status} ${response.statusText}`,
+              response.ok ? "success" : "error",
+            );
+            setOutput(data);
+          } catch (error) {
+            setStatus(`Falha ao listar exercícios: ${error.message}`, "error");
+            setOutput(error.stack || String(error));
+          }
+        });
+
+      document
+        .getElementById("formAddExercicio")
+        .addEventListener("submit", async (event) => {
+          event.preventDefault();
+          const treinoId = document.getElementById(
+            "idTreinoAddExercicio",
+          ).value;
+          const body = {
+            nome: document.getElementById("nomeExercicio").value.trim(),
+            series: Number(document.getElementById("seriesExercicio").value),
+            repeticoes: Number(
+              document.getElementById("repeticoesExercicio").value,
+            ),
+            carga: Number(document.getElementById("cargaExercicio").value),
+            observacao: document
+              .getElementById("observacaoExercicio")
+              .value.trim(),
+          };
+
+          try {
+            setStatus(`Enviando POST /treinos/${treinoId}/exercicios...`, "");
+            const { response, data } = await requestJson(
+              `/treinos/${treinoId}/exercicios`,
+              {
+                method: "POST",
+                body: JSON.stringify(body),
+              },
+            );
+            setStatus(
+              `POST /treinos/${treinoId}/exercicios -> ${response.status} ${response.statusText}`,
+              response.ok ? "success" : "error",
+            );
+            setOutput(data);
+          } catch (error) {
+            setStatus(
+              `Falha ao adicionar exercício: ${error.message}`,
+              "error",
+            );
+            setOutput(error.stack || String(error));
+          }
+        });
+
+      document
+        .getElementById("formRemoveExercicio")
+        .addEventListener("submit", async (event) => {
+          event.preventDefault();
+          const treinoId = document.getElementById(
+            "idTreinoRemoveExercicio",
+          ).value;
+          const exercicioId =
+            document.getElementById("idExercicioRemove").value;
+
+          try {
+            setStatus(
+              `Enviando DELETE /treinos/${treinoId}/exercicios/${exercicioId}...`,
+              "",
+            );
+            const { response, data } = await requestJson(
+              `/treinos/${treinoId}/exercicios/${exercicioId}`,
+              {
+                method: "DELETE",
+              },
+            );
+            setStatus(
+              `DELETE /treinos/${treinoId}/exercicios/${exercicioId} -> ${response.status} ${response.statusText}`,
+              response.ok ? "success" : "error",
+            );
+            setOutput(data ?? "Sem conteúdo retornado.");
+          } catch (error) {
+            setStatus(`Falha ao remover exercício: ${error.message}`, "error");
             setOutput(error.stack || String(error));
           }
         });
