@@ -3,6 +3,7 @@ package br.unifor.service.treino.unitreino.Controller;
 import br.unifor.service.treino.unitreino.Model.ModelTreino;
 import br.unifor.service.treino.unitreino.Service.ServiceTreino;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -16,6 +17,7 @@ import java.net.URI;
 import java.util.List;
 
 @RestController
+@CrossOrigin(origins = "*")
 @RequestMapping("/treinos")
 public class ControllerTreino {
 

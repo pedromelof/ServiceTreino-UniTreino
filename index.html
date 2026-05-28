@@ -1,0 +1,525 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Microserviço de Treino</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        font-family: Arial, Helvetica, sans-serif;
+        --bg: #08111f;
+        --panel: #0f1b2d;
+        --panel-2: #13253a;
+        --text: #edf4ff;
+        --muted: #bfd3ee;
+        --accent: #49d5ff;
+        --accent-2: #8b7cff;
+        --danger: #ff7a90;
+        --success: #7cf0b2;
+        --border: #22344b;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: radial-gradient(
+          circle at top,
+          #12243c 0%,
+          var(--bg) 45%,
+          #040911 100%
+        );
+        color: var(--text);
+      }
+
+      .shell {
+        width: min(1200px, calc(100vw - 24px));
+        margin: 0 auto;
+        padding: 24px 0 40px;
+      }
+
+      header {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        gap: 16px;
+        align-items: end;
+        margin-bottom: 18px;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: clamp(1.8rem, 4vw, 2.6rem);
+      }
+
+      p.subtitle {
+        color: var(--muted);
+        margin: 6px 0 0;
+      }
+
+      .chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 12px;
+        border-radius: 999px;
+        background: rgba(73, 213, 255, 0.12);
+        border: 1px solid rgba(73, 213, 255, 0.25);
+        color: var(--text);
+        font-size: 0.95rem;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 18px;
+      }
+
+      .card {
+        background: linear-gradient(
+          180deg,
+          rgba(15, 27, 45, 0.95),
+          rgba(9, 18, 31, 0.98)
+        );
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        padding: 16px;
+        box-shadow: 0 10px 24px rgba(0, 0, 0, 0.25);
+      }
+
+      .card h2 {
+        margin-top: 0;
+        font-size: 1.08rem;
+      }
+
+      .card p {
+        color: var(--muted);
+        font-size: 0.95rem;
+      }
+
+      .row {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .field {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        margin-bottom: 10px;
+      }
+
+      label {
+        color: var(--muted);
+        font-size: 0.95rem;
+      }
+
+      input,
+      textarea,
+      button {
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        background: var(--panel-2);
+        color: var(--text);
+        padding: 10px 12px;
+        font: inherit;
+      }
+
+      textarea {
+        min-height: 82px;
+        resize: vertical;
+      }
+
+      button {
+        cursor: pointer;
+        border-color: transparent;
+        background: linear-gradient(135deg, var(--accent), var(--accent-2));
+        color: #08111f;
+        font-weight: 700;
+        transition:
+          transform 0.08s ease,
+          opacity 0.18s ease;
+      }
+
+      button:hover {
+        transform: translateY(-1px);
+        opacity: 0.95;
+      }
+
+      button.secondary {
+        background: rgba(255, 255, 255, 0.06);
+        color: var(--text);
+        border-color: var(--border);
+      }
+
+      button.danger {
+        background: linear-gradient(135deg, #ff9ab0, #ff6e8a);
+        color: #1e090d;
+      }
+
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 6px;
+      }
+
+      .status {
+        margin-top: 12px;
+        padding: 12px;
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        background: rgba(255, 255, 255, 0.04);
+        color: var(--text);
+        min-height: 42px;
+        font-size: 0.95rem;
+      }
+
+      .status.success {
+        border-color: rgba(124, 240, 178, 0.35);
+        background: rgba(124, 240, 178, 0.08);
+        color: #eafff4;
+      }
+      .status.error {
+        border-color: rgba(255, 122, 144, 0.35);
+        background: rgba(255, 122, 144, 0.08);
+        color: #fff0f3;
+      }
+
+      .route-list {
+        display: grid;
+        gap: 10px;
+        margin-top: 8px;
+      }
+
+      .route-pill {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        align-items: center;
+        padding: 10px 12px;
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        background: rgba(255, 255, 255, 0.04);
+        color: var(--muted);
+      }
+
+      code {
+        color: #9be6ff;
+        font-family: Consolas, "Courier New", monospace;
+        font-size: 0.94rem;
+      }
+
+      .output {
+        margin-top: 12px;
+        background: #040a12;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 12px;
+        overflow: auto;
+        max-height: 360px;
+        font-family: Consolas, "Courier New", monospace;
+        white-space: pre-wrap;
+        color: #dff5ff;
+        font-size: 0.92rem;
+      }
+
+      @media (max-width: 980px) {
+        .grid {
+          grid-template-columns: 1fr;
+        }
+        .row {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="shell">
+      <header>
+        <div>
+          <h1>Microserviço de Treino</h1>
+          <p class="subtitle">
+            Consuma as rotas do backend direto do navegador e veja as respostas
+            em tempo real.
+          </p>
+        </div>
+        <div class="chip">
+          Base URL: <strong id="baseLabel">http://localhost:8080</strong>
+        </div>
+      </header>
+
+      <section class="grid">
+        <article class="card">
+          <h2>Configuração</h2>
+          <p>Altere a URL base se o backend estiver rodando em outra porta.</p>
+          <div class="field">
+            <label for="baseUrl">URL base da API</label>
+            <input id="baseUrl" type="text" value="http://localhost:8080" />
+          </div>
+          <div class="actions">
+            <button type="button" id="btnListar">Listar treinos</button>
+            <button type="button" class="secondary" id="btnLimpar">
+              Limpar saída
+            </button>
+          </div>
+        </article>
+
+        <article class="card">
+          <h2>Rotas disponíveis</h2>
+          <div class="route-list">
+            <div class="route-pill"><span>GET</span><code>/treinos</code></div>
+            <div class="route-pill"><span>POST</span><code>/treinos</code></div>
+            <div class="route-pill">
+              <span>PUT</span><code>/treinos/{id}</code>
+            </div>
+            <div class="route-pill">
+              <span>DELETE</span><code>/treinos/{id}</code>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <section class="grid" style="margin-top: 18px">
+        <article class="card">
+          <h2>Criar treino</h2>
+          <p>
+            Use esta rota para adicionar um treino na memória do microserviço.
+          </p>
+          <form id="formCreate">
+            <div class="field">
+              <label for="nome">Nome</label
+              ><input id="nome" required placeholder="Ex.: Corrida leve" />
+            </div>
+            <div class="field">
+              <label for="descricao">Descrição</label
+              ><textarea
+                id="descricao"
+                required
+                placeholder="Descreva o treino..."
+              ></textarea>
+            </div>
+            <div class="field">
+              <label for="duracaoMinutos">Duração (minutos)</label
+              ><input id="duracaoMinutos" type="number" min="1" required />
+            </div>
+            <div class="actions">
+              <button type="submit">POST /treinos</button>
+            </div>
+          </form>
+        </article>
+
+        <article class="card">
+          <h2>Atualizar treino</h2>
+          <p>Atualize os campos de um treino existente pelo ID.</p>
+          <form id="formUpdate">
+            <div class="row">
+              <div class="field">
+                <label for="idUpdate">ID</label
+                ><input id="idUpdate" type="number" required placeholder="1" />
+              </div>
+              <div class="field">
+                <label for="duracaoUpdate">Duração (minutos)</label
+                ><input id="duracaoUpdate" type="number" min="1" required />
+              </div>
+            </div>
+            <div class="field">
+              <label for="nomeUpdate">Nome</label
+              ><input id="nomeUpdate" required />
+            </div>
+            <div class="field">
+              <label for="descricaoUpdate">Descrição</label
+              ><textarea id="descricaoUpdate" required></textarea>
+            </div>
+            <div class="actions">
+              <button type="submit">PUT /treinos/{id}</button>
+            </div>
+          </form>
+        </article>
+
+        <article class="card">
+          <h2>Excluir treino</h2>
+          <p>Remova um treino pelo ID.</p>
+          <form id="formDelete">
+            <div class="field">
+              <label for="idDelete">ID</label
+              ><input id="idDelete" type="number" required placeholder="1" />
+            </div>
+            <div class="actions">
+              <button type="submit" class="danger">DELETE /treinos/{id}</button>
+            </div>
+          </form>
+        </article>
+
+        <article class="card">
+          <h2>Resposta da API</h2>
+          <p>Veja o status HTTP e o JSON retornado por cada chamada.</p>
+          <div id="statusBox" class="status">
+            Pronto para consultar as rotas.
+          </div>
+          <pre id="outputBox" class="output">
+{\n  "mensagem": "Nenhuma chamada efetuada ainda."\n}</pre
+          >
+        </article>
+      </section>
+    </main>
+
+    <script>
+      const baseUrlInput = document.getElementById("baseUrl");
+      const baseLabel = document.getElementById("baseLabel");
+      const statusBox = document.getElementById("statusBox");
+      const outputBox = document.getElementById("outputBox");
+
+      function setStatus(message, kind = "") {
+        statusBox.textContent = message;
+        statusBox.className = "status" + (kind ? ` ${kind}` : "");
+      }
+
+      function setOutput(value) {
+        outputBox.textContent =
+          typeof value === "string" ? value : JSON.stringify(value, null, 2);
+      }
+
+      function getBaseUrl() {
+        const raw = (baseUrlInput.value || "").trim().replace(/\/$/, "");
+        return raw || "http://localhost:8080";
+      }
+
+      function updateBaseLabel() {
+        baseLabel.textContent = getBaseUrl();
+      }
+
+      baseUrlInput.addEventListener("input", updateBaseLabel);
+      updateBaseLabel();
+
+      async function requestJson(path, options = {}) {
+        const url = `${getBaseUrl()}${path}`;
+        const response = await fetch(url, {
+          headers: {
+            "Content-Type": "application/json",
+            ...(options.headers || {}),
+          },
+          ...options,
+        });
+
+        const text = await response.text();
+        let data = null;
+        try {
+          data = text ? JSON.parse(text) : null;
+        } catch (error) {
+          data = text;
+        }
+
+        return { response, data, text };
+      }
+
+      document
+        .getElementById("btnListar")
+        .addEventListener("click", async () => {
+          try {
+            setStatus("Chamando GET /treinos...", "");
+            const { response, data } = await requestJson("/treinos");
+            setStatus(
+              `GET /treinos -> ${response.status} ${response.statusText}`,
+              response.ok ? "success" : "error",
+            );
+            setOutput(data);
+          } catch (error) {
+            setStatus(`Falha ao acessar a API: ${error.message}`, "error");
+            setOutput(error.stack || String(error));
+          }
+        });
+
+      document.getElementById("btnLimpar").addEventListener("click", () => {
+        setStatus("Saída limpa.", "");
+        setOutput('{\n  "mensagem": "Nenhuma chamada efetuada ainda."\n}');
+      });
+
+      document
+        .getElementById("formCreate")
+        .addEventListener("submit", async (event) => {
+          event.preventDefault();
+          const body = {
+            nome: document.getElementById("nome").value.trim(),
+            descricao: document.getElementById("descricao").value.trim(),
+            duracaoMinutos: Number(
+              document.getElementById("duracaoMinutos").value,
+            ),
+          };
+
+          try {
+            setStatus("Enviando POST /treinos...", "");
+            const { response, data } = await requestJson("/treinos", {
+              method: "POST",
+              body: JSON.stringify(body),
+            });
+            setStatus(
+              `POST /treinos -> ${response.status} ${response.statusText}`,
+              response.ok ? "success" : "error",
+            );
+            setOutput(data);
+          } catch (error) {
+            setStatus(`Falha no POST: ${error.message}`, "error");
+            setOutput(error.stack || String(error));
+          }
+        });
+
+      document
+        .getElementById("formUpdate")
+        .addEventListener("submit", async (event) => {
+          event.preventDefault();
+          const id = document.getElementById("idUpdate").value;
+          const body = {
+            nome: document.getElementById("nomeUpdate").value.trim(),
+            descricao: document.getElementById("descricaoUpdate").value.trim(),
+            duracaoMinutos: Number(
+              document.getElementById("duracaoUpdate").value,
+            ),
+          };
+
+          try {
+            setStatus(`Enviando PUT /treinos/${id}...`, "");
+            const { response, data } = await requestJson(`/treinos/${id}`, {
+              method: "PUT",
+              body: JSON.stringify(body),
+            });
+            setStatus(
+              `PUT /treinos/${id} -> ${response.status} ${response.statusText}`,
+              response.ok ? "success" : "error",
+            );
+            setOutput(data);
+          } catch (error) {
+            setStatus(`Falha no PUT: ${error.message}`, "error");
+            setOutput(error.stack || String(error));
+          }
+        });
+
+      document
+        .getElementById("formDelete")
+        .addEventListener("submit", async (event) => {
+          event.preventDefault();
+          const id = document.getElementById("idDelete").value;
+
+          try {
+            setStatus(`Enviando DELETE /treinos/${id}...`, "");
+            const { response, data } = await requestJson(`/treinos/${id}`, {
+              method: "DELETE",
+            });
+            setStatus(
+              `DELETE /treinos/${id} -> ${response.status} ${response.statusText}`,
+              response.ok ? "success" : "error",
+            );
+            setOutput(data ?? "Sem conteúdo retornado.");
+          } catch (error) {
+            setStatus(`Falha no DELETE: ${error.message}`, "error");
+            setOutput(error.stack || String(error));
+          }
+        });
+    </script>
+  </body>
+</html>
