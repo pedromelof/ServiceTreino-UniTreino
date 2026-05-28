@@ -250,7 +250,10 @@
           </p>
         </div>
         <div class="chip">
-          Base URL: <strong id="baseLabel">http://localhost:8080</strong>
+          Base URL:
+          <strong id="baseLabel"
+            >https://servicetreino-unitreino.onrender.com</strong
+          >
         </div>
       </header>
 
@@ -260,7 +263,11 @@
           <p>Altere a URL base se o backend estiver rodando em outra porta.</p>
           <div class="field">
             <label for="baseUrl">URL base da API</label>
-            <input id="baseUrl" type="text" value="http://localhost:8080" />
+            <input
+              id="baseUrl"
+              type="text"
+              value="https://servicetreino-unitreino.onrender.com"
+            />
           </div>
           <div class="actions">
             <button type="button" id="btnListar">Listar treinos</button>
@@ -494,7 +501,7 @@
 
       function getBaseUrl() {
         const raw = (baseUrlInput.value || "").trim().replace(/\/$/, "");
-        return raw || "http://localhost:8080";
+        return raw || "https://servicetreino-unitreino.onrender.com";
       }
 
       function updateBaseLabel() {
