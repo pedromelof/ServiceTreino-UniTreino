@@ -33,6 +33,12 @@ public class ServiceTreino {
             existing.setNome(novo.getNome());
             existing.setDescricao(novo.getDescricao());
             existing.setDuracaoMinutos(novo.getDuracaoMinutos());
+
+            existing.getExercicios().clear();
+            if (novo.getExercicios() != null) {
+                existing.getExercicios().addAll(novo.getExercicios());
+            }
+
             return repository.save(existing);
         });
     }
